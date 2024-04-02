@@ -1,17 +1,31 @@
 import express from 'express';
 const app = express();
+import cors from "cors";
 import mongoose from 'mongoose';
 import _ from "dotenv";
-import {validate} from "./middleware/validation";
-import {Register} from "./routes/Register";
-import {Login} from "./routes/Login";
 _.config();
 
+app.use(cors());
 app.use(express.json());
 mongoose.connect(process.env.MONGODB_URL!)
 
-app.post('/api/register',validate,Register)
-app.post('/api/login',validate,Login)
+ 
+//auth imports
+    //jwt imports
+import register from "./auth/jwt/register/route"
+import resendotp from "./auth/jwt/register/resendotp/route"
+import registeremail from "./auth/jwt/register/email/route"
+    //google auth imports
+import {googleAuthhandler} from "./auth/googleAuthhandler"
 
 
-app.listen(process.env.PORT,()=>console.log("listening on port 3000"))
+
+app.get("/api/sessions/oauth/google",googleAuthhandler)
+
+app.post("/api/register",register)
+
+app.post("/api/register/resendotp",resendotp)
+
+app.post("/api/register/email",registeremail)
+
+app.listen(process.env.PORT,()=>console.log(`listening on port ${process.env.PORT}` ))

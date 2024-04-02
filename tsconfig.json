@@ -8,7 +8,7 @@
         "outDir": "dist"
     },
     "lib": [
-        "ES3"
+        "es3"
     ],
     "include": ["src/*.ts"]
 }
