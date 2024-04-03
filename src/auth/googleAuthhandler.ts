@@ -30,39 +30,27 @@ export async function googleAuthhandler(req:Request, res:Response){
 
         //get user from the token
         const user:googleUserType = jwt.decode(id_token);
-        console.log(user)
 
         //upsert the user
-        let existingUser = await User.findOne({email:user.email});
-        if (existingUser){
-            await User.updateOne({email:existingUser.email},{
-                email:user.email,
-                firstName:user.given_name,
-                lastname:user.family_name,
-                password:user.at_hash,
-                picture:user.picture,
-                verifyToken:id_token,
+        await User.findOneAndUpdate(
+            { email: user.email },
+            {
+                email: user.email,
+                firstName: user.given_name,
+                lastName: user.family_name,
+                password: user.at_hash,
+                picture: user.picture,
+                verifyToken: id_token,
                 verifTokenExpiry: user.exp
-            });
-        }else{  
-            const newUser = new User({
-                email:user.email,
-                firstName:user.given_name,
-                lastname:user.family_name,
-                password:user.at_hash,
-                picture:user.picture,
-                verifyToken:id_token,
-                verifTokenExpiry: user.exp
-            });
-            await newUser.save()
-        }
+            },
+            { upsert: true }
+        );
 
-        //set cookies
-        res.cookie("auth-token", id_token, { httpOnly: true })
-        
-        //redirect back to client
-        res.redirect(process.env.NEXT_PUBLIC_HOST)
-        res.status(201).send("user registered");
+        // Set cookie
+        res.cookie("auth-token", id_token, { httpOnly: true });
+
+        // Redirect back to client
+        res.redirect(process.env.NEXT_PUBLIC_HOST);
     } catch (error) {
         console.log(error);
         res.json({ error})

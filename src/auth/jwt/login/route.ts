@@ -7,11 +7,16 @@ export async function POST(req:Request, res:Response){
     try {
         const {email,password} =req.body;
 
-        const user = await User.findOne({email});  
+        const user = await User.findOne({email});
+        if (!user){
+            res.send("invalid email")
+        }   
+
         const valid = await bcrypt.compare(password,user.password);
         
         if(!valid){
-            res.send("invalid password")
+            res.send("invalid password");
+            return;
         }
 
         //create token data
