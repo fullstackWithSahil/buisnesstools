@@ -18,6 +18,9 @@ import registeremail from "./auth/jwt/register/email/route"
     //google auth imports
 import {googleAuthhandler} from "./auth/googleAuthhandler"
 
+//teams routes
+import {findUser} from "./routes/users"
+
 
 
 app.get("/api/sessions/oauth/google",googleAuthhandler)
@@ -27,5 +30,7 @@ app.post("/api/register",register)
 app.post("/api/register/resendotp",resendotp)
 
 app.post("/api/register/email",registeremail)
+
+app.get("/api/users/find",findUser)
 
 app.listen(process.env.PORT,()=>console.log(`listening on port ${process.env.PORT}` ))
