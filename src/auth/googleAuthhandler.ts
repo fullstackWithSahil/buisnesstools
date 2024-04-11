@@ -29,7 +29,7 @@ export async function googleAuthhandler(req:Request, res:Response){
         const {id_token} = await getGoogleToken(code);
 
         //get user from the token
-        const user:googleUserType = jwt.decode(id_token);
+        const user:any = jwt.decode(id_token);
 
         //upsert the user
         await User.findOneAndUpdate(
@@ -50,7 +50,7 @@ export async function googleAuthhandler(req:Request, res:Response){
         res.cookie("auth-token", id_token, { httpOnly: true });
 
         // Redirect back to client
-        res.redirect(process.env.NEXT_PUBLIC_HOST);
+        res.redirect(`${process.env.NEXT_PUBLIC_HOST}/profile`);
     } catch (error) {
         console.log(error);
         res.json({ error})

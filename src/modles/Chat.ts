@@ -12,7 +12,8 @@ const chatModle = new mongoose.Schema({
     latestMessage:[
         {
             type:mongoose.Schema.Types.ObjectId,
-            ref:"message"
+            ref:"message",
+            required:false
         }
     ],
     groupAdmin:{

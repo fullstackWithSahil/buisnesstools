@@ -3,34 +3,23 @@ const app = express();
 import cors from "cors";
 import mongoose from 'mongoose';
 import _ from "dotenv";
+import cookieParser from "cookie-parser";
 _.config();
 
 app.use(cors());
+app.use(cookieParser())
 app.use(express.json());
 mongoose.connect(process.env.MONGODB_URL!)
-
  
 //auth imports
-    //jwt imports
-import register from "./auth/jwt/register/route"
-import resendotp from "./auth/jwt/register/resendotp/route"
-import registeremail from "./auth/jwt/register/email/route"
-    //google auth imports
+import authRouter from "./routes/Auth"
 import {googleAuthhandler} from "./auth/googleAuthhandler"
 
-//teams routes
-import {findUser} from "./routes/users"
+import userRouter from "./routes/user.route";
 
-
-
+app.use("/api",authRouter);
 app.get("/api/sessions/oauth/google",googleAuthhandler)
 
-app.post("/api/register",register)
-
-app.post("/api/register/resendotp",resendotp)
-
-app.post("/api/register/email",registeremail)
-
-app.get("/api/users/find",findUser)
+app.use("/api/users",userRouter)
 
 app.listen(process.env.PORT,()=>console.log(`listening on port ${process.env.PORT}` ))

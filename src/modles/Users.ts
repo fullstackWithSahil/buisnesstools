@@ -6,10 +6,7 @@ interface UserDocument extends Document {
     email: string;
     password: string;
     picture?: string,
-    forgotPasswordToken?: string;
-    forgotPasswordExpiry?: Date;
-    verifToken?: string;
-    verifTokenExpiry?: Date;
+    plan: string
 }
 
 const Userschema = new mongoose.Schema<UserDocument>({
@@ -17,11 +14,8 @@ const Userschema = new mongoose.Schema<UserDocument>({
     lastname: { type: String, required: true },
     email: { type: String, unique: true },
     password: { type: String, required: true },
-    picture: {type:String,required: false,},
-    forgotPasswordToken: String,
-    forgotPasswordExpiry: Date,
-    verifToken: String,
-    verifTokenExpiry: Date,
+    picture: {type:String,required: false},
+    plan:{ type: String, required:false ,default:"free" },
 });
 
 
