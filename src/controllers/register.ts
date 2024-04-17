@@ -20,7 +20,10 @@ export async function sendOtp(req: Request, res: Response) {
     const { email } = req.body;
     const Existing = await User.findOne({ email });
     if (Existing) {
-      res.send("email already exists");
+      res.json({
+        title:"email already exists",
+        description: "an account with this email already exists so try a different one"
+      })
       return;
     } else {
       //generating otp sending email and saving it in reddis database
@@ -32,11 +35,18 @@ export async function sendOtp(req: Request, res: Response) {
       //     subject:"OTP"
       // });
       await kv.set(email, otp);
-      res.send("otp sent successfully");
+      res.json({
+        title: "OTP sent successfully",
+        description: "An OTP for verication has been sent to your mail",
+        ok: true
+      })
     }
   } catch (error: any) {
     console.error("Error in sending otp:", error);
-    res.json({ error });
+    res.json({
+      title:"Error sending email",
+      description:"There was an error sending email try again"
+    });
   }
 }
 
@@ -59,62 +69,50 @@ export async function resendotp(req: Request, res: Response) {
     res.send("otp sent successfully");
   } catch (error) {
     console.error("Error in resending otp:", error);
-    res.json({ error });
+    res.send("something went wrong try again");
   }
 }
 
 export async function register(req: Request, res: Response) {
   try {
     const { firstName, lastname, email, password, otp } = req.body;
-
-    // Validate the OTP and clear the database
-    const realOtp = await kv.get(email);
-    if (realOtp !== +otp) {
-      return res.status(400).send("Invalid OTP");
+    
+    //verify otp
+    const realOtp =await kv.get(email);
+    
+    if (otp!=realOtp){
+      res.send("Invalid otp");
+      return;
     }
-    await kv.del(email);
 
-    // Hashing the password
+    //hashing password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashPassword = await bcrypt.hash(password,salt);
 
-    // Saving user in database
+    //saving user in database
     const newUser = new User({
       firstName,
-      lastname, // Fixed typo here
-      password: hashedPassword,
+      lastname,
       email,
+      password: hashPassword,
     });
 
-    await newUser.save();
-    const token = jwt.sign(
-      {
-        id: newUser._id, // Fixed capitalization of _id
-        plan: newUser.plan, // Assuming newUser.plan exists
-      },
-      process.env.JWT_SECRET || "default_secret"
-    ); // Provide a default value for JWT_SECRET
-
-    res.cookie("auth-token", token, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      secure: true
-    });
-
-    const dataToSend = {
-      _id: newUser._id,
-      firstName: newUser.firstName,
-      lastname: newUser.lastname, // Fixed capitalization of lastname
-      email: newUser.email,
-      picture: newUser.picture, // Assuming newUser.picture exists
-    };
-
-    // res.cookie("user-data", dataToSend, {
-    //   maxAge: 30 * 24 * 60 * 60 * 1000,
-    //   secure: false, // Set secure to false for development
-    //   httpOnly: false,
-    // });
-    res.status(201).json(dataToSend);
+    if (newUser) {
+			// Generate JWT token here
+			const token = jwt.sign({ newUser }, process.env.JWT_SECRET!, {
+        expiresIn: "15d",
+      });
+      
+      await newUser.save();
+      res.cookie('token', token, {
+        secure: true,
+        httpOnly:true,
+      })
+			res.status(201).json(newUser);
+      // res.redirect(`${process.env.NEXT_PUBLIC_HOST}profile`)
+		} else {
+			res.status(400).json({ error: "Invalid user data" });
+		}
   } catch (error) {
     console.error("Error registering user:", error);
     res.status(500).json({ error: "Internal server error" }); // Provide a generic error message

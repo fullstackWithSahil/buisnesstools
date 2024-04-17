@@ -1,6 +1,6 @@
 import express from "express";
 import {register, resendotp,sendOtp} from "../controllers/register";
-import {login,logout} from "../controllers/login"
+import {forgotPassword, login,logout} from "../controllers/login"
 
 const router = express.Router();
 
@@ -14,4 +14,6 @@ router.post("/login",login)
 
 router.post("/logout",logout)
 
-export default router
+router.post("/forgotpassword",forgotPassword)
+
+export default router;
