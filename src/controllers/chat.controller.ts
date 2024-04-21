@@ -4,18 +4,17 @@ import Chat from "../modles/Chat";
 
 export async function createTeam(req: Request, res: Response){
     try {
-        const {members,teamName,user} = req.body;
+        const {members,team,user} = req.body;
         const admin= user._id;
 
         //chech if team already exists
-        const teamTocreateArray =await Chat.find({chatName:teamName});
+        const teamTocreateArray =await Chat.find({chatName:team});
         const teamTocreate = teamTocreateArray.find(team=>team.groupAdmin==user._id);
         
         if(teamTocreate){
             res.json({message:"Team already exists"});
             return;
         }
-
 
         const membersId = members.map((member) =>{
             return new Promise(async(resolve, reject) =>{
@@ -28,12 +27,14 @@ export async function createTeam(req: Request, res: Response){
             })
         });
         let userIds = await Promise.all(membersId);
-        userIds.push(admin)
 
         const newChat = new Chat({
-            chatName:teamName,
+            chatName:team,
             isGroupChat:true,
-            members:userIds,
+            members:[
+                ...userIds,
+                admin
+            ],
             groupAdmin:admin
         })
 
@@ -49,7 +50,7 @@ export async function createTeam(req: Request, res: Response){
 
 export async function addMembers(req: Request, res: Response) {
     try {
-        const { teamName, email } = req.body;
+        const { team, email } = req.body;
 
         // Find the user ID of the member to be added
         const addedMember = await User.findOne({ email }).select("_id");
@@ -57,8 +58,8 @@ export async function addMembers(req: Request, res: Response) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Find the chat based on teamName
-        const chat = await Chat.findOne({ chatName: teamName });
+        // Find the chat based on team
+        const chat = await Chat.findOne({ chatName: team });
         if (!chat) {
             return res.status(404).json({ error: "Chat not found" });
         }
@@ -81,7 +82,7 @@ export async function addMembers(req: Request, res: Response) {
 
 export async function removeMember(req: Request, res: Response) {
     try {
-        const { teamName, email } = req.body;
+        const { team, email } = req.body;
 
         // Find the user ID of the member to be removed
         const removedMember = await User.findOne({ email }).select("_id");
@@ -89,8 +90,8 @@ export async function removeMember(req: Request, res: Response) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Find the chat based on teamName
-        const chat = await Chat.findOne({ chatName: teamName });
+        // Find the chat based on team
+        const chat = await Chat.findOne({ chatName: team });
         if (!chat) {
             return res.status(404).json({ error: "Chat not found" });
         }
@@ -114,9 +115,9 @@ export async function removeMember(req: Request, res: Response) {
 
 export async function deleteTeam(req: Request, res: Response){
     try {
-        const {teamName,user} = req.body;
+        const {team,user} = req.body;
         //finding the correct team
-        const teamToDeleteArray =await Chat.find({chatName:teamName});
+        const teamToDeleteArray =await Chat.find({chatName:team});
         const teamToDelete = teamToDeleteArray.find(team=>team.groupAdmin==user._id);
         
         if(!teamToDeleteArray|| !teamToDelete){
@@ -128,5 +129,16 @@ export async function deleteTeam(req: Request, res: Response){
     } catch (error) {
         console.log("Error deleting team", error);
         res.status(500).json({ error: "Internal server error"});
+    }
+}
+
+export async function getChats(req: Request, res: Response) {
+    try {
+        const { user } = req.body; // Assuming user contains the ID of the user
+        const chats = await Chat.find({ members: user }).populate('members');
+        res.json(chats);
+    } catch (error) {
+        console.log("Error getting chats:", error);
+        res.status(500).json({ error: "Something went wrong" });
     }
 }

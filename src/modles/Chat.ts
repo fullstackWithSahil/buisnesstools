@@ -9,16 +9,17 @@ const chatModle = new mongoose.Schema({
             ref:"users"
         }
     ],
-    latestMessage:[
-        {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"message",
-            required:false
-        }
-    ],
+    latestMessage:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"message",
+        required:false
+    },
     groupAdmin:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"users"
+    },
+    picture:{
+        type:String,
     }
 },{
     timestamps:true,

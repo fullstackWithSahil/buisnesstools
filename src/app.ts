@@ -38,12 +38,4 @@ app.use("/api/users",userRouter)
 
 app.use("/api/teams",chatRouter)
 
-app.get("/cookie",(req,res)=>{
-    res.cookie("sahil","cookie",{
-        maxAge:200000000000,
-        httpOnly:true
-    })
-    res.send("ok")
-})
-
 app.listen(process.env.PORT,()=>console.log(`listening on port ${process.env.PORT}` ))

@@ -32,22 +32,25 @@ export async function googleAuthhandler(req:Request, res:Response){
         const user:any = jwt.decode(id_token);
 
         //upsert the user
-        await User.findOneAndUpdate(
+        const newUser = await User.findOneAndUpdate(
             { email: user.email },
             {
                 email: user.email,
                 firstName: user.given_name,
                 lastName: user.family_name,
                 password: user.at_hash,
-                picture: user.picture,
-                verifyToken: id_token,
-                verifTokenExpiry: user.exp
+                picture: user.picture
             },
             { upsert: true }
         );
 
+        //generate token
+        const token = jwt.sign({ newUser }, process.env.JWT_SECRET!, {
+            expiresIn: "15d",
+        });
+
         // Set cookie
-        res.cookie("auth-token", id_token, { httpOnly: true });
+        res.cookie("auth-token", token, { httpOnly: true });
 
         // Redirect back to client
         res.redirect(`${process.env.NEXT_PUBLIC_HOST}/profile`);

@@ -99,17 +99,17 @@ export async function register(req: Request, res: Response) {
 
     if (newUser) {
 			// Generate JWT token here
-			const token = jwt.sign({ newUser }, process.env.JWT_SECRET!, {
+			const token = jwt.sign({ newUser:newUser }, process.env.JWT_SECRET!, {
         expiresIn: "15d",
       });
       
       await newUser.save();
-      res.cookie('token', token, {
+      res.cookie('auth-token', token, {
         secure: true,
         httpOnly:true,
       })
+      
 			res.status(201).json(newUser);
-      // res.redirect(`${process.env.NEXT_PUBLIC_HOST}profile`)
 		} else {
 			res.status(400).json({ error: "Invalid user data" });
 		}

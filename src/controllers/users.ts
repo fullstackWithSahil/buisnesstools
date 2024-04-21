@@ -3,9 +3,13 @@ import User from "../modles/Users";
 
 
 export async function findUser(req:Request,res:Response){
-    const email = req.params.email;
-    const data = await User.find({ email:{$regex: new RegExp(email,'i')}})
-    res.json(data);
+    try {
+        const email = req.params.email;
+        const data = await User.find({ email:{$regex: new RegExp(email,'i')}}).select("-password")
+        res.json(data);
+    } catch (error) {
+        console.log("error finding users",error);
+    }
 }
 
 
