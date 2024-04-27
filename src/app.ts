@@ -29,6 +29,8 @@ import {googleAuthhandler} from "./auth/googleAuthhandler"
 
 import userRouter from "./routes/user.route";
 import chatRouter from "./routes/Chats.route";
+import { protectRoute } from './middleware/protect';
+import {feedback} from "./routes/feedback";
 
 app.use("/api/auth",authRouter);
 
@@ -37,5 +39,7 @@ app.get("/api/sessions/oauth/google",googleAuthhandler)
 app.use("/api/users",userRouter)
 
 app.use("/api/teams",chatRouter)
+
+app.post("/api/feedback",protectRoute,feedback)
 
 app.listen(process.env.PORT,()=>console.log(`listening on port ${process.env.PORT}` ))
