@@ -32,6 +32,10 @@ import chatRouter from "./routes/Chats.route";
 import { protectRoute } from './middleware/protect';
 import {feedback} from "./routes/feedback";
 
+app.get('/',(req,res)=>{
+    res.send('<h1>backend for buisnesstools</h1>')
+})
+
 app.use("/api/auth",authRouter);
 
 app.get("/api/sessions/oauth/google",googleAuthhandler)
