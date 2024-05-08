@@ -29,11 +29,11 @@ export async function sendOtp(req: Request, res: Response) {
       //generating otp sending email and saving it in reddis database
       const otp = genOtp();
       console.log("otp is", otp);
-      // await sendMail({
-      //     text:`otp sent successfully ${otp}`,
-      //     to:email,
-      //     subject:"OTP"
-      // });
+      await sendMail({
+          text:`otp for registering is ${otp}`,
+          to:email,
+          subject:"OTP"
+      });
       await kv.set(email, otp);
       res.json({
         title: "OTP sent successfully",
@@ -59,11 +59,11 @@ export async function resendotp(req: Request, res: Response) {
     const otp = genOtp();
     console.log("otp is", otp);
 
-    await sendMail({
-      text: `otp sent successfully ${otp}`,
-      to: email,
-      subject: "OTP",
-    });
+    // await sendMail({
+    //   text: `otp sent successfully ${otp}`,
+    //   to: email,
+    //   subject: "OTP",
+    // });
 
     await kv.set(email, otp);
     res.send("otp sent successfully");
