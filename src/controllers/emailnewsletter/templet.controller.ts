@@ -75,7 +75,9 @@ export async function addSubscribers(req: Request, res: Response) {
     const obj: any = jwt.verify(id, process.env.JWT_SECRET);
     const { email } = req.body;
 
-    const existingSubscriber = await Subscribers.find({});
+    const existingSubscriber = await Subscribers.find({
+      
+    });
 
     const newSubscriber = new Subscribers({
       email,
