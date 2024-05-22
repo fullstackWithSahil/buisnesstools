@@ -8,7 +8,7 @@ _.config();
 
 app.use(
   cors({
-    origin: [process.env.NEXT_PUBLIC_HOST,"https://buisnesstools.vercel.app/"]
+    origin: [process.env.NEXT_PUBLIC_HOST,"https://buisnesstools.vercel.app/"],
     credentials: true,
   })
 );
