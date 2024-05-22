@@ -4,6 +4,9 @@ import cors from "cors";
 import mongoose from "mongoose";
 import _ from "dotenv";
 import cookieParser from "cookie-parser";
+import { inject } from '@vercel/analytics';
+ 
+inject();
 _.config();
 
 app.use(
