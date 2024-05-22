@@ -11,13 +11,14 @@ _.config();
 
 app.use(
   cors({
-    origin: process.env.NEXT_PUBLIC_HOST,
+    origin: [process.env.NEXT_PUBLIC_HOST,"https://buisnesstools.vercel.app/"],
     credentials: true,
   })
 );
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", process.env.NEXT_PUBLIC_HOST);
+  res.setHeader("Access-Control-Allow-Origin", "https://buisnesstools.vercel.app/");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
